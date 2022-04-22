@@ -106,13 +106,12 @@ module.exports = function (app) {
     });
   }
 
-  function configureWeb3Response (err, web3, receiver, response, tokenAddress) {
-    
+  function configureWeb3Response(err, web3, receiver, response, tokenAddress) {
     if (err) return generateErrorResponse(response, err);
 
     const balance = web3.eth.getBalance(receiver).toNumber();
 
-    if (Number(balance) > 0) {
+    if (Number(balance) >= 0.001 * 10 ** 18) {
       console.log('Not eligible to receive: kcs balance !== 0');
       return generateErrorResponse(response, {
         code: 500,
