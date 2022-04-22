@@ -2,7 +2,7 @@
 <html lang="en">
 
 <head>
-  <title>KCC testnet faucet</title>
+  <title>KCC mainnet faucet</title>
   <link rel="stylesheet" type="text/css" href="./assets/stylesheets/application.css">
   <link rel="apple-touch-icon" href="./favicons/favicon-192x192.png">
   <link rel="icon" type="image/png" sizes="192x192" href="./favicons/favicon-192x192.png">
@@ -13,26 +13,28 @@
   <script src='https://www.google.com/recaptcha/api.js'></script>
 
 </head>
+
 <body>
   <section class="content">
     <form action="/" method="POST" id="faucetForm">
       <div class="request-tokens" style="width:430px;">
         <img src="./assets/images/logo-with-text.svg" alt="logo">
-        <h1 class="title">KCC testnet faucet</h1>
+        <h1 class="title">KCC mainet faucet</h1>
         <div class="input-area">
           <input type="text" id="receiver" name="receiver" placeholder="Enter your address here to receive KCS" />
           <select name="tokens" id="tokenList">
           </select>
         </div>
         <h2 class="mark">
-          Please use <a href="https://rpc-testnet.kcc.network">https://rpc-testnet.kcc.network</a> RPC to connect<br>
-          to the KCC testnet.
+          Please use <a href="https://rpc-mainnet.kcc.network">https://rpc-mainnet.kcc.network</a> RPC to connect<br>
+          to the KCC mainnet.
         </h2>
         <div class="text-xs-center">
           <div class="g-recaptcha" data-sitekey="6Ld5K4saAAAAAEgvmRxKn3lyznR7Yuo8ZbBqs0T_"></div>
         </div>
         <div class="button-faucet">
-          <button type="submit" id="requestTokens" style="width:430px" class="request-tokens-button">Request 1
+          <button type="submit" id="requestTokens" style="width:430px;height:48px" class="request-tokens-button">Request
+            1
             KCS</button>
         </div>
       </div>

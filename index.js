@@ -35,7 +35,7 @@ app.get('/', function(request, response) {
   response.send('KCC testnet faucet');
 });
 
-app.set('port', (process.env.PORT || 5000));
+app.set('port', (process.env.PORT || 5001));
 
 app.listen(app.get('port'), function () {
     console.log('KCC Testnet faucet is running on port', app.get('port'));
