@@ -50,7 +50,7 @@ module.exports = function (app) {
 
     if (lastDateKey !== todaysKey) {
       // new day
-      app.set('requestKey', todaysKey);
+      app.set('lastDateKey', todaysKey);
       app.set('amount', 0);
     }
 
