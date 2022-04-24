@@ -21,7 +21,7 @@ const generateTokenOptionList = () => {
   const tokenListDom = tokens
     .map((token) => {
       const isETH = token.address === '0x0';
-      return `<option value="${token.address}">${isETH ? 1 : 100} ${
+      return `<option value="${token.address}">${isETH ? 0.0005 : 100} ${
         token.symbol
       }</option>`;
     })
@@ -37,7 +37,7 @@ const changeInputPlaceholder = (tokenName) => {
 };
 
 const changeButtonText = (tokenName) => {
-  const prefix = 'REQUEST  ' + (tokenName === 'KCS' ? '1 ' : '100 ');
+  const prefix = 'REQUEST  ' + (tokenName === 'KCS' ? '0.0005' : '100 ');
   const button = $('#requestTokens');
   button.text(`${prefix}${tokenName}`);
 };

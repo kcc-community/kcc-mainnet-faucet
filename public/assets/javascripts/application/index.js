@@ -28,16 +28,15 @@ $(function () {
         getTxCallBack(data.success.txHash, function () {
           $('#receiver').val('');
           loader.addClass('hidden');
-          var amount = tokenAddress === '0x0' ? '1' : '100';
+          var amount = tokenAddress === '0x0' ? '0.0005' : '100';
           swal(
             'Success',
             `<span style="color:#00D296;font-weight:bold;">${amount} ${tokenName}</span> is successfully transfered to ` +
               receiver +
-              " in Tx<br /><a style='color:#00D296' href='https://scan-testnet.kcc.network/tx/" +
+              " in Tx<br /><a style='color:#00D296' href='https://explorer.kcc.io/en/tx/" +
               data.success.txHash +
               '/internal-transactions' +
               "' target='_blank'>" +
-              data.success.txHash +
               '</a>',
             'success'
           );

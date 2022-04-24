@@ -36,6 +36,8 @@ module.exports = function (app) {
   app.post('/', function (request, response) {
     var recaptureResponse = request.body.captcha;
 
+    console.log('recaptureResponse', recaptureResponse);
+
     // check recapture
     if (!recaptureResponse)
       return generateErrorResponse(response, {
