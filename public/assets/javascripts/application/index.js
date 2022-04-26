@@ -37,6 +37,7 @@ $(function () {
               data.success.txHash +
               '/internal-transactions' +
               "' target='_blank'>" +
+              data.success.txHash +
               '</a>',
             'success'
           );
