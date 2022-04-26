@@ -1,5 +1,5 @@
 {
-  "name": "kcc-testnet-faucet-front",
+  "name": "kcc-mainet-faucet-front",
   "version": "1.0.0",
   "description": "kcc testnet POA Network network faucet frontend",
   "main": "gulpfile.js",
