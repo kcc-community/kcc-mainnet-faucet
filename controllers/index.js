@@ -188,9 +188,9 @@ module.exports = function (app) {
           // When receiver get the KCS token, put the address into invalidAddressSet for 20 days
           if (tokenAddress === '0x0') {
             const receivedList = app.get('InvalidAddressSet');
-            receivedList.add(receiver.toLowerCase());
+            receivedList.add(receiver);
             setTimeout(() => {
-              receivedList.delete(receiver.toLowerCase());
+              receivedList.delete(receiver);
               app.set('InvalidAddressSet', receivedList);
             }, 20 * 24 * 60 * 60 * 1000);
             // setTimeout(() => {
