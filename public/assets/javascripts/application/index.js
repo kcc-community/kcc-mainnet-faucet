@@ -35,7 +35,6 @@ $(function () {
               receiver +
               " in Tx<br /><a style='color:#00D296' href='https://explorer.kcc.io/en/tx/" +
               data.success.txHash +
-              '/internal-transactions' +
               "' target='_blank'>" +
               data.success.txHash +
               '</a>',

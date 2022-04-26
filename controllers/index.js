@@ -39,12 +39,12 @@ module.exports = function (app) {
     console.log('recaptureResponse', recaptureResponse);
 
     // check recapture
-    if (!recaptureResponse)
-      return generateErrorResponse(response, {
-        code: 500,
-        title: 'Error',
-        message: 'Invalid captcha',
-      });
+    // if (!recaptureResponse)
+    //   return generateErrorResponse(response, {
+    //     code: 500,
+    //     title: 'Error',
+    //     message: 'Invalid captcha',
+    //   });
 
     // each request need to check the key,if new day is coming,reset key & amount
     const lastDateKey = app.get('lastDateKey');
@@ -82,26 +82,27 @@ module.exports = function (app) {
       }
     }
 
-    validateCaptcha(recaptureResponse, function (err, out) {
-      validateCaptchaResponse(err, out, receiver, response, tokenAddress);
-    });
+    // validateCaptcha(recaptureResponse, function (err, out) {
+    //   validateCaptchaResponse(err, out, receiver, response, tokenAddress);
+    // });
 
-    // validateCaptchaResponse(receiver, response, tokenAddress);
+    validateCaptchaResponse(receiver, response, tokenAddress);
   });
 
-  function validateCaptchaResponse(err, out, receiver, response, tokenAddress) {
-    if (!out)
-      return generateErrorResponse(response, {
-        code: 500,
-        title: 'Error',
-        message: 'Invalid captcha',
-      });
-    if (!out.success)
-      return generateErrorResponse(response, {
-        code: 500,
-        title: 'Error',
-        message: 'Invalid captcha',
-      });
+  // function validateCaptchaResponse(err, out, receiver, response, tokenAddress) {
+  function validateCaptchaResponse(receiver, response, tokenAddress) {
+    // if (!out)
+    //   return generateErrorResponse(response, {
+    //     code: 500,
+    //     title: 'Error',
+    //     message: 'Invalid captcha',
+    //   });
+    // if (!out.success)
+    //   return generateErrorResponse(response, {
+    //     code: 500,
+    //     title: 'Error',
+    //     message: 'Invalid captcha',
+    //   });
 
     configureWeb3(config, function (err, web3) {
       configureWeb3Response(err, web3, receiver, response, tokenAddress);
