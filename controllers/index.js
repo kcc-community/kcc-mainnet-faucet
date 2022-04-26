@@ -185,14 +185,14 @@ module.exports = function (app) {
           amount = amount + airdropAmount;
           app.set('amount', amount);
 
-          // When receiver get the KCS token, put the address into invalidAddressSet for 30 days
+          // When receiver get the KCS token, put the address into invalidAddressSet for 20 days
           if (tokenAddress === '0x0') {
             const receivedList = app.get('InvalidAddressSet');
             receivedList.add(receiver);
             setTimeout(() => {
               receivedList.delete(receiver);
               app.set('InvalidAddressSet', receivedList);
-            }, 30 * 24 * 60 * 60 * 1000);
+            }, 20 * 24 * 60 * 60 * 1000);
             // setTimeout(() => {
             //   receivedList.delete(receiver);
             //   app.set('InvalidAddressSet', receivedList);
