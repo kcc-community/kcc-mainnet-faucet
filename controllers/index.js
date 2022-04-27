@@ -49,15 +49,13 @@ module.exports = function (app) {
   app.post('/', function (request, response) {
     var recaptureResponse = request.body.captcha;
 
-    console.log('recaptureResponse', recaptureResponse);
-
     // check recapture
-    // if (!recaptureResponse)
-    //   return generateErrorResponse(response, {
-    //     code: 500,
-    //     title: 'Error',
-    //     message: 'Invalid captcha',
-    //   });
+    if (!recaptureResponse)
+      return generateErrorResponse(response, {
+        code: 500,
+        title: 'Error',
+        message: 'Invalid captcha',
+      });
 
     // each request need to check the key,if new day is coming,reset key & amount
     const lastDateKey = app.get('lastDateKey');
@@ -95,28 +93,26 @@ module.exports = function (app) {
       }
     }
 
-    // validateCaptcha(recaptureResponse, function (err, out) {
-    //   validateCaptchaResponse(err, out, receiver, response, tokenAddress);
-    // });
+    validateCaptcha(recaptureResponse, function (err, out) {
+      validateCaptchaResponse(err, out, receiver, response, tokenAddress);
+    });
 
-    validateCaptchaResponse(receiver, response, tokenAddress);
+    // validateCaptchaResponse(receiver, response, tokenAddress);
   });
 
-  // function validateCaptchaResponse(err, out, receiver, response, tokenAddress) {
-  function validateCaptchaResponse(receiver, response, tokenAddress) {
-    // function validateCaptchaResponse(receiver, response, tokenAddress) {
-    // if (!out)
-    //   return generateErrorResponse(response, {
-    //     code: 500,
-    //     title: 'Error',
-    //     message: 'Invalid captcha',
-    //   });
-    // if (!out.success)
-    //   return generateErrorResponse(response, {
-    //     code: 500,
-    //     title: 'Error',
-    //     message: 'Invalid captcha',
-    //   });
+  function validateCaptchaResponse(err, out, receiver, response, tokenAddress) {
+    if (!out)
+      return generateErrorResponse(response, {
+        code: 500,
+        title: 'Error',
+        message: 'Invalid captcha',
+      });
+    if (!out.success)
+      return generateErrorResponse(response, {
+        code: 500,
+        title: 'Error',
+        message: 'Invalid captcha',
+      });
 
     configureWeb3(config, function (err, web3) {
       configureWeb3Response(err, web3, receiver, response, tokenAddress);
@@ -124,7 +120,7 @@ module.exports = function (app) {
   }
 
   function configureWeb3Response(err, web3, receiver, response, tokenAddress) {
-    // if (err) return generateErrorResponse(response, err);
+    if (err) return generateErrorResponse(response, err);
 
     const balance = web3.eth.getBalance(receiver).toNumber();
 
@@ -137,9 +133,6 @@ module.exports = function (app) {
       });
     }
 
-    // var senderPrivateKey = config.Ethereum[config.environment].privateKey;
-
-    // const privateKeyHex = Buffer.from(senderPrivateKey, 'hex');
     if (!web3.isAddress(receiver))
       return generateErrorResponse(response, {
         code: 500,
@@ -149,26 +142,6 @@ module.exports = function (app) {
 
     var gasPrice = parseInt(web3.eth.gasPrice);
     var gasPriceHex = web3.toHex(gasPrice);
-
-    // var nonce = web3.eth.getTransactionCount(
-    //   config.Ethereum[config.environment].account
-    // );
-    // var nonceHex = web3.toHex(nonce);
-
-    // const rawTx = {
-    //   nonce: nonceHex,
-    //   gasPrice: gasPriceHex,
-    //   gasLimit: config.Ethereum.gasLimit,
-    //   to: receiver,
-    //   value: web3.toHex(web3.toWei(airdropAmount)),
-    //   data: '0x00',
-    //   chainId: web3.toHex(web3.version.network),
-    // };
-
-    // var tx = new EthereumTx(rawTx);
-    // tx.sign(privateKeyHex);
-
-    // var serializedTx = tx.serialize();
 
     provider
       .sendTransaction({
@@ -180,7 +153,6 @@ module.exports = function (app) {
       .then((tx) => {
         sendRawTransactionResponse(err, tx.hash, response);
         tx.wait(3).then(() => {
-          console.log('hash', tx);
           let amount = app.get('amount');
           amount = amount + airdropAmount;
           app.set('amount', amount);
