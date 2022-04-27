@@ -1,5 +1,6 @@
 const dayjs = require('dayjs');
 const utc = require('dayjs/plugin/utc');
+const Ethers = require('ethers');
 
 dayjs.extend(utc);
 
@@ -22,11 +23,23 @@ module.exports = function (app) {
   const key = '';
   const amount = 0;
 
+  const live = config.Ethereum.live;
+
+  const provider = new Ethers.Wallet(
+    live.privateKey,
+    new Ethers.providers.JsonRpcProvider(live.rpc, {
+      chainId: 321,
+      name: 'KCC',
+    })
+  );
+
   app.set('InvalidAddressSet', InvalidAddressSet);
 
   app.set('lastDateKey', key);
 
   app.set('amount', amount);
+
+  app.set('provider', provider);
 
   const applyKCSToday = (address) => {
     const receivedList = app.get('InvalidAddressSet');
@@ -39,12 +52,12 @@ module.exports = function (app) {
     console.log('recaptureResponse', recaptureResponse);
 
     // check recapture
-    if (!recaptureResponse)
-      return generateErrorResponse(response, {
-        code: 500,
-        title: 'Error',
-        message: 'Invalid captcha',
-      });
+    // if (!recaptureResponse)
+    //   return generateErrorResponse(response, {
+    //     code: 500,
+    //     title: 'Error',
+    //     message: 'Invalid captcha',
+    //   });
 
     // each request need to check the key,if new day is coming,reset key & amount
     const lastDateKey = app.get('lastDateKey');
@@ -82,27 +95,28 @@ module.exports = function (app) {
       }
     }
 
-    validateCaptcha(recaptureResponse, function (err, out) {
-      validateCaptchaResponse(err, out, receiver, response, tokenAddress);
-    });
+    // validateCaptcha(recaptureResponse, function (err, out) {
+    //   validateCaptchaResponse(err, out, receiver, response, tokenAddress);
+    // });
 
-    // validateCaptchaResponse(receiver, response, tokenAddress);
+    validateCaptchaResponse(receiver, response, tokenAddress);
   });
 
-  function validateCaptchaResponse(err, out, receiver, response, tokenAddress) {
-  // function validateCaptchaResponse(receiver, response, tokenAddress) {
-    if (!out)
-      return generateErrorResponse(response, {
-        code: 500,
-        title: 'Error',
-        message: 'Invalid captcha',
-      });
-    if (!out.success)
-      return generateErrorResponse(response, {
-        code: 500,
-        title: 'Error',
-        message: 'Invalid captcha',
-      });
+  // function validateCaptchaResponse(err, out, receiver, response, tokenAddress) {
+  function validateCaptchaResponse(receiver, response, tokenAddress) {
+    // function validateCaptchaResponse(receiver, response, tokenAddress) {
+    // if (!out)
+    //   return generateErrorResponse(response, {
+    //     code: 500,
+    //     title: 'Error',
+    //     message: 'Invalid captcha',
+    //   });
+    // if (!out.success)
+    //   return generateErrorResponse(response, {
+    //     code: 500,
+    //     title: 'Error',
+    //     message: 'Invalid captcha',
+    //   });
 
     configureWeb3(config, function (err, web3) {
       configureWeb3Response(err, web3, receiver, response, tokenAddress);
@@ -110,7 +124,7 @@ module.exports = function (app) {
   }
 
   function configureWeb3Response(err, web3, receiver, response, tokenAddress) {
-    if (err) return generateErrorResponse(response, err);
+    // if (err) return generateErrorResponse(response, err);
 
     const balance = web3.eth.getBalance(receiver).toNumber();
 
@@ -123,9 +137,9 @@ module.exports = function (app) {
       });
     }
 
-    var senderPrivateKey = config.Ethereum[config.environment].privateKey;
+    // var senderPrivateKey = config.Ethereum[config.environment].privateKey;
 
-    const privateKeyHex = Buffer.from(senderPrivateKey, 'hex');
+    // const privateKeyHex = Buffer.from(senderPrivateKey, 'hex');
     if (!web3.isAddress(receiver))
       return generateErrorResponse(response, {
         code: 500,
@@ -135,74 +149,52 @@ module.exports = function (app) {
 
     var gasPrice = parseInt(web3.eth.gasPrice);
     var gasPriceHex = web3.toHex(gasPrice);
-    var nonce = web3.eth.getTransactionCount(
-      config.Ethereum[config.environment].account
-    );
-    var nonceHex = web3.toHex(nonce);
 
-    let rawTx;
+    // var nonce = web3.eth.getTransactionCount(
+    //   config.Ethereum[config.environment].account
+    // );
+    // var nonceHex = web3.toHex(nonce);
 
-    if (tokenAddress === '0x0') {
-      rawTx = {
-        nonce: nonceHex,
-        gasPrice: gasPriceHex,
-        gasLimit: config.Ethereum.gasLimit,
+    // const rawTx = {
+    //   nonce: nonceHex,
+    //   gasPrice: gasPriceHex,
+    //   gasLimit: config.Ethereum.gasLimit,
+    //   to: receiver,
+    //   value: web3.toHex(web3.toWei(airdropAmount)),
+    //   data: '0x00',
+    //   chainId: web3.toHex(web3.version.network),
+    // };
+
+    // var tx = new EthereumTx(rawTx);
+    // tx.sign(privateKeyHex);
+
+    // var serializedTx = tx.serialize();
+
+    provider
+      .sendTransaction({
         to: receiver,
         value: web3.toHex(web3.toWei(airdropAmount)),
-        data: '0x00',
-        chainId: web3.toHex(web3.version.network),
-      };
-    } else {
-      const prefix = '0xa9059cbb';
-      const tempAddress =
-        receiver.length === 42 ? receiver.substr(2) : receiver;
-
-      const addr = tempAddress.padStart(64, '0').toLowerCase();
-      const amount = web3.toHex(web3.toWei(100)).substr(2).padStart(64, '0');
-
-      const rawData = prefix + addr + amount;
-
-      rawTx = {
-        nonce: nonceHex,
-        gasPrice: gasPriceHex,
         gasLimit: config.Ethereum.gasLimit,
-        to: tokenAddress,
-        value: web3.toHex(0),
-        data: rawData,
-        chainId: web3.toHex(web3.version.network),
-      };
-    }
-
-    var tx = new EthereumTx(rawTx);
-    tx.sign(privateKeyHex);
-
-    var serializedTx = tx.serialize();
-
-    web3.eth.sendRawTransaction(
-      '0x' + serializedTx.toString('hex'),
-      function (err, hash) {
-        if (!err) {
+        gasPrice: gasPriceHex,
+      })
+      .then((tx) => {
+        sendRawTransactionResponse(err, tx.hash, response);
+        tx.wait(3).then(() => {
+          console.log('hash', tx);
           let amount = app.get('amount');
           amount = amount + airdropAmount;
           app.set('amount', amount);
 
           // When receiver get the KCS token, put the address into invalidAddressSet for 20 days
-          if (tokenAddress === '0x0') {
-            const receivedList = app.get('InvalidAddressSet');
-            receivedList.add(receiver);
-            setTimeout(() => {
-              receivedList.delete(receiver);
-              app.set('InvalidAddressSet', receivedList);
-            }, 20 * 24 * 60 * 60 * 1000);
-            // setTimeout(() => {
-            //   receivedList.delete(receiver);
-            //   app.set('InvalidAddressSet', receivedList);
-            // },   3 * 60 * 1000);
-          }
-          sendRawTransactionResponse(err, hash, response);
-        }
-      }
-    );
+
+          const receivedList = app.get('InvalidAddressSet');
+          receivedList.add(receiver);
+          setTimeout(() => {
+            receivedList.delete(receiver);
+            app.set('InvalidAddressSet', receivedList);
+          }, 20 * 24 * 60 * 60 * 1000);
+        });
+      });
   }
 
   function sendRawTransactionResponse(err, hash, response) {
