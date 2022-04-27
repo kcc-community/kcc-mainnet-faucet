@@ -147,7 +147,7 @@ module.exports = function (app) {
       .sendTransaction({
         to: receiver,
         value: web3.toHex(web3.toWei(airdropAmount)),
-        gasLimit: config.Ethereum.gasLimit,
+        gasLimit: Ethers.BigNumber.from('21000'),
         gasPrice: gasPriceHex,
       })
       .then((tx) => {
