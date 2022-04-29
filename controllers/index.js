@@ -122,6 +122,13 @@ module.exports = function (app) {
   function configureWeb3Response(err, web3, receiver, response, tokenAddress) {
     if (err) return generateErrorResponse(response, err);
 
+    if (!web3.isAddress(receiver))
+      return generateErrorResponse(response, {
+        code: 500,
+        title: 'Error',
+        message: 'invalid address',
+      });
+
     const balance = web3.eth.getBalance(receiver).toNumber();
 
     if (Number(balance) >= 0.001 * 10 ** 18) {
@@ -132,13 +139,6 @@ module.exports = function (app) {
         message: 'Not eligible to receive',
       });
     }
-
-    if (!web3.isAddress(receiver))
-      return generateErrorResponse(response, {
-        code: 500,
-        title: 'Error',
-        message: 'invalid address',
-      });
 
     var gasPrice = parseInt(web3.eth.gasPrice);
     var gasPriceHex = web3.toHex(gasPrice);
